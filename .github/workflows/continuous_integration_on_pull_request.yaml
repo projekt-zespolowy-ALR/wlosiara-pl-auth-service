@@ -1,0 +1,163 @@
+name: Continuous integration on pull request
+
+on:
+  pull_request:
+
+env:
+  SETUP_NODE_NODE_VERSION: 19
+
+jobs:
+  prettier-check:
+    name: Prettier check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.SETUP_NODE_NODE_VERSION }}
+          cache: "npm"
+      - name: Install dependencies
+        run: |
+          npm ci
+      - name: Run prettier
+        run: |
+          npm run prettier:check
+  generate-openapi:
+    name: Generate OpenAPI
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.SETUP_NODE_NODE_VERSION }}
+          cache: "npm"
+      - name: Install dependencies
+        run: |
+          npm ci
+      - name: Generate OpenAPI
+        run: |
+          npm run generate-openapi
+      - name: Upload OpenAPI
+        uses: actions/upload-artifact@v3
+        with:
+          name: openapi
+          path: openapi
+  eslint-check:
+    name: ESLint check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.SETUP_NODE_NODE_VERSION }}
+          cache: "npm"
+      - name: Install dependencies
+        run: |
+          npm ci
+      - name: Run eslint
+        run: |
+          npm run eslint:check
+  jest-check-unit:
+    name: Jest check unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.SETUP_NODE_NODE_VERSION }}
+          cache: "npm"
+      - name: Install dependencies
+        run: |
+          npm ci
+      - name: Run Jest
+        run: |
+          npm run jest:check:unit
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage_report
+          path: coverage_report
+  jest-check-int:
+    name: Jest check integration tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.SETUP_NODE_NODE_VERSION }}
+          cache: "npm"
+      - name: Install dependencies
+        run: |
+          npm ci
+      - name: Run Jest
+        run: |
+          npm run jest:check:int
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage_report
+          path: coverage_report
+  npm-audit-check:
+    name: npm audit check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.SETUP_NODE_NODE_VERSION }}
+          cache: "npm"
+      - name: Run npm audit
+        run: |
+          npm run npm-audit:check
+  typescript-check:
+    name: TypeScript check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.SETUP_NODE_NODE_VERSION }}
+          cache: "npm"
+      - name: Install dependencies
+        run: |
+          npm ci
+      - name: Run TypeScript
+        run: |
+          npm run typescript:check
+  compile:
+    name: Compile
+    needs: [eslint-check, jest-check-unit, jest-check-int, typescript-check]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.SETUP_NODE_NODE_VERSION }}
+          cache: "npm"
+      - name: Install dependencies
+        run: |
+          npm ci
+      - name: Compile
+        run: |
+          npm run compile
+      - name: Upload dist
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: dist
