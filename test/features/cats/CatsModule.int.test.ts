@@ -1,96 +1,109 @@
 import {Test} from "@nestjs/testing";
-import {VersioningType} from "@nestjs/common";
 import {describe, test, expect, beforeEach, afterEach, beforeAll} from "@jest/globals";
-import {FastifyAdapter, NestFastifyApplication} from "@nestjs/platform-fastify";
+import type {NestFastifyApplication} from "@nestjs/platform-fastify";
 import CatsModule from "../../../src/features/cats/CatsModule.js";
 import * as Testcontainers from "testcontainers";
 import AppOrmModule from "../../../src/orm/AppOrmModule.js";
-import AppConfig from "../../../src/config/AppConfig.js";
+import AppConfig from "../../../src/app_config/AppConfig.js";
 import {TypedConfigModule} from "nest-typed-config";
 import * as fs from "fs/promises";
 
-import testsConfig from "../../config/testsConfig.js";
+import testsConfig from "../../app_config/testsConfig.js";
 import generatePostgresqlPassword from "../../utils/generatePostgresqlPassword.js";
+import createTestingApp from "../../utils/createTestingApp.js";
 
-let postgresqlContainer: Testcontainers.StartedPostgreSqlContainer | null = null;
-let app: NestFastifyApplication | null = null;
-let postgresqlInitializationSqlScript: string | null = null;
+describe("HelloModule", () => {
+	let postgresqlContainer: Testcontainers.StartedPostgreSqlContainer;
+	let app: NestFastifyApplication;
+	let postgresqlInitializationSqlScript: string;
 
-beforeAll(async () => {
-	postgresqlInitializationSqlScript = await fs.readFile(
-		testsConfig.TESTS_POSTGRESQL_INITIALIZATION_SQL_SCRIPT_PATH,
-		"utf-8"
-	);
-});
+	beforeAll(async () => {
+		postgresqlInitializationSqlScript = await fs.readFile(
+			testsConfig.TESTS_POSTGRESQL_INITIALIZATION_SQL_SCRIPT_PATH,
+			"utf-8"
+		);
+	});
 
-beforeEach(async () => {
-	if (!postgresqlInitializationSqlScript) {
-		throw new Error("Database initialization SQL is not initialized");
-	}
-	const postgresqlContainerPassword = generatePostgresqlPassword();
+	beforeEach(async () => {
+		const postgresqlContainerPassword = generatePostgresqlPassword();
 
-	const postgresqlContainer = await new Testcontainers.PostgreSqlContainer(
-		testsConfig.TESTS_POSTGRESQL_CONTAINER_IMAGE_NAME
-	)
-		.withPassword(postgresqlContainerPassword)
-		.withEnvironment({"PGPASSWORD": postgresqlContainerPassword})
-		.withDatabase(testsConfig.TESTS_POSTGRESQL_CONTAINER_DATABASE_NAME)
-		.start();
+		postgresqlContainer = await new Testcontainers.PostgreSqlContainer(
+			testsConfig.TESTS_POSTGRESQL_CONTAINER_IMAGE_NAME
+		)
+			.withPassword(postgresqlContainerPassword)
+			.withEnvironment({"PGPASSWORD": postgresqlContainerPassword})
+			.withDatabase(testsConfig.TESTS_POSTGRESQL_CONTAINER_DATABASE_NAME)
+			.start();
 
-	await postgresqlContainer.exec([
-		"psql",
-		`--host=localhost`,
-		`--port=5432`,
-		`--username=${postgresqlContainer.getUsername()}`,
-		`--dbname=${postgresqlContainer.getDatabase()}`,
-		`--no-password`,
-		`--command`,
-		`${postgresqlInitializationSqlScript}`,
-	]);
+		await postgresqlContainer.exec([
+			"psql",
+			`--host=localhost`,
+			`--port=5432`,
+			`--username=${postgresqlContainer.getUsername()}`,
+			`--dbname=${postgresqlContainer.getDatabase()}`,
+			`--no-password`,
+			`--command`,
+			`${postgresqlInitializationSqlScript}`,
+		]);
 
-	const AppConfigModule = TypedConfigModule.forRoot({
-		schema: AppConfig,
-		load: () => {
-			if (!postgresqlContainer) {
-				throw new Error("PostgreSQL container is not initialized");
-			}
-			return {
+		const AppConfigModule = TypedConfigModule.forRoot({
+			schema: AppConfig,
+			load: () => ({
 				POSTGRES_HOST: postgresqlContainer.getHost(),
 				POSTGRES_PORT: postgresqlContainer.getPort(),
 				POSTGRES_USERNAME: postgresqlContainer.getUsername(),
 				POSTGRES_PASSWORD: postgresqlContainer.getPassword(),
 				POSTGRES_DATABASE: postgresqlContainer.getDatabase(),
-			};
-		},
+			}),
+		});
+		const appModule = await Test.createTestingModule({
+			imports: [CatsModule, AppOrmModule, AppConfigModule],
+		}).compile();
+
+		app = await createTestingApp(appModule);
+	}, testsConfig.TESTS_INTEGRATION_TEST_BEFORE_EACH_TIMEOUT * 1000);
+
+	afterEach(async () => {
+		await Promise.all([postgresqlContainer.stop(), app.close()]);
 	});
-	const appModule = await Test.createTestingModule({
-		imports: [CatsModule, AppOrmModule, AppConfigModule],
-	}).compile();
-
-	app = appModule.createNestApplication<NestFastifyApplication>(new FastifyAdapter());
-	app.enableVersioning({
-		type: VersioningType.URI,
+	describe("v1", () => {
+		describe("Empty database", () => {
+			test("GET /cats", async () => {
+				const response = await app.inject({
+					method: "GET",
+					url: "/v1/cats",
+				});
+				expect(response.statusCode).toBe(200);
+				expect(response.json()).toEqual({
+					data: [],
+					meta: {skip: 0, take: 10, totalItemsCount: 0, pageItemsCount: 0},
+				});
+			});
+			test("GET /cats/:id", async () => {
+				const response = await app.inject({
+					method: "GET",
+					url: "/v1/cats/1",
+				});
+				expect(response.statusCode).toBe(404);
+			});
+			test("POST /cats", async () => {
+				const addCatRequestBody = {
+					name: "test2",
+					age: 1,
+					breed: "test",
+				} as const;
+				const response = await app.inject({
+					method: "POST",
+					url: "/v1/cats",
+					payload: addCatRequestBody,
+				});
+				expect(response.statusCode).toBe(201);
+			});
+		});
 	});
-	await app.init();
-	await app.getHttpAdapter().getInstance().ready();
-}, testsConfig.TESTS_INTEGRATION_TEST_BEFORE_EACH_TIMEOUT * 1000);
-
-afterEach(async () => {
-	if (postgresqlContainer) {
-		await postgresqlContainer.stop();
-	}
-	if (app) {
-		await app.close();
-	}
-});
-
-describe("HelloModule", () => {
 	describe("v2", () => {
 		describe("Empty database", () => {
 			test("GET /cats", async () => {
-				if (!app) {
-					throw new Error("App is not initialized");
-				}
 				const response = await app.inject({
 					method: "GET",
 					url: "/v2/cats",
@@ -102,9 +115,6 @@ describe("HelloModule", () => {
 				});
 			});
 			test("GET /cats/:id", async () => {
-				if (!app) {
-					throw new Error("App is not initialized");
-				}
 				const response = await app.inject({
 					method: "GET",
 					url: "/v2/cats/1",
@@ -112,9 +122,6 @@ describe("HelloModule", () => {
 				expect(response.statusCode).toBe(404);
 			});
 			test("POST /cats", async () => {
-				if (!app) {
-					throw new Error("App is not initialized");
-				}
 				const addCatRequestBody = {
 					name: "test2",
 					age: 1,
@@ -130,9 +137,6 @@ describe("HelloModule", () => {
 		});
 		describe("Database with one cat", () => {
 			test("GET /cats", async () => {
-				if (!app) {
-					throw new Error("App is not initialized");
-				}
 				const addCatRequestBody = {
 					name: "test2",
 					age: 1,

@@ -1,0 +1,25 @@
+{
+	"github": {
+		"release": true
+	},
+	"npm": {
+		"publish": false
+	},
+
+	"plugins": {
+		"@j-ulrich/release-it-regex-bumper": {
+			"out": [
+				{
+					"file": "./helm/Chart.yaml",
+					"search": "version: (.*)",
+					"replace": "version: {{version}}"
+				},
+				{
+					"file": "./helm/Chart.yaml",
+					"search": "appVersion: \"(.*)\"",
+					"replace": "appVersion: \"{{version}}\""
+				}
+			]
+		}
+	}
+}

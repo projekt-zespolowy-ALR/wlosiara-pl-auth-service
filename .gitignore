@@ -10,4 +10,4 @@ node_modules/
 /coverage/
 .vscode/
 /coverage_report/
-/openapi/
+/helm/charts/

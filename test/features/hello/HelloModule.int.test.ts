@@ -2,11 +2,12 @@ import * as dotenv from "dotenv";
 import * as path from "path";
 dotenv.config({path: path.join(__dirname, ".env.test")});
 import {Test} from "@nestjs/testing";
-import {VersioningType} from "@nestjs/common";
-import {describe, test, expect, beforeEach} from "@jest/globals";
+import {describe, test, expect, beforeEach, afterEach} from "@jest/globals";
 import HelloModule from "../../../src/features/hello/HelloModule.js";
-import {FastifyAdapter, NestFastifyApplication} from "@nestjs/platform-fastify";
-import AppConfigModule from "../../../src/config/AppConfigModule.js";
+import type {NestFastifyApplication} from "@nestjs/platform-fastify";
+import AppConfigModule from "../../../src/app_config/AppConfigModule.js";
+
+import createTestingApp from "../../utils/createTestingApp.js";
 
 describe("HelloModule", () => {
 	let app: NestFastifyApplication;
@@ -15,12 +16,10 @@ describe("HelloModule", () => {
 			imports: [HelloModule, AppConfigModule],
 		}).compile();
 
-		app = appModule.createNestApplication<NestFastifyApplication>(new FastifyAdapter());
-		app.enableVersioning({
-			type: VersioningType.URI,
-		});
-		await app.init();
-		await app.getHttpAdapter().getInstance().ready();
+		app = await createTestingApp(appModule);
+	});
+	afterEach(async () => {
+		await app.close();
 	});
 	describe("v1", () => {
 		test("GET /hello", async () => {
