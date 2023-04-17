@@ -1,0 +1,12 @@
+port: 3000
+
+postgresql:
+  auth:
+    database: "authservice"
+    username: "authservice"
+  primary:
+    initdb:
+      scripts-configmap: "authservice-postgresql-initdb-scripts"
+
+image:
+  repository: null

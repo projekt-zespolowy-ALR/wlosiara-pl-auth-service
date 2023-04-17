@@ -1,7 +1,6 @@
 import {TypeOrmModule} from "@nestjs/typeorm";
 
-import AppConfig from "../config/AppConfig.js";
-import CatEntity from "../features/cats/CatEntity.js";
+import AppConfig from "../app_config/AppConfig.js";
 
 const AppOrmModule = TypeOrmModule.forRootAsync({
 	inject: [AppConfig],
@@ -12,7 +11,7 @@ const AppOrmModule = TypeOrmModule.forRootAsync({
 		username: config.POSTGRES_USERNAME,
 		password: config.POSTGRES_PASSWORD,
 		database: config.POSTGRES_DATABASE,
-		entities: [CatEntity],
+		autoLoadEntities: true,
 		synchronize: false,
 	}),
 });
