@@ -6,7 +6,7 @@ import * as Testcontainers from "testcontainers";
 import AppOrmModule from "../../../src/orm/AppOrmModule.js";
 import AppConfig from "../../../src/app_config/AppConfig.js";
 import {TypedConfigModule} from "nest-typed-config";
-import * as fs from "fs/promises";
+import * as Fs from "fs/promises";
 
 import testsConfig from "../../app_config/testsConfig.js";
 import generatePostgresqlPassword from "../../utils/generatePostgresqlPassword.js";
@@ -18,7 +18,7 @@ describe("HelloModule", () => {
 	let postgresqlInitializationSqlScript: string;
 
 	beforeAll(async () => {
-		postgresqlInitializationSqlScript = await fs.readFile(
+		postgresqlInitializationSqlScript = await Fs.readFile(
 			testsConfig.TESTS_POSTGRESQL_INITIALIZATION_SQL_SCRIPT_PATH,
 			"utf-8"
 		);
