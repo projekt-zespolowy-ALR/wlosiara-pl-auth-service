@@ -1,7 +1,7 @@
 {
-	"name": "authservice",
+	"name": "wlosiara-pl-auth-service",
 	"version": "0.0.0",
-	"description": "Włosiara.pl - AuthService",
+	"description": "Włosiara.pl - wlosiara-pl-auth-service",
 	"private": true,
 	"main": "./dist/src/main.js",
 	"scripts": {
@@ -30,14 +30,14 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/projekt-zespolowy-ALR/AuthService.git"
+		"url": "git+https://github.com/projekt-zespolowy-ALR/wlosiara-pl-auth-service.git"
 	},
 	"author": "Włosiara.pl",
 	"license": "UNLICENSED",
 	"bugs": {
-		"url": "https://github.com/projekt-zespolowy-ALR/AuthService/issues"
+		"url": "https://github.com/projekt-zespolowy-ALR/wlosiara-pl-auth-service/issues"
 	},
-	"homepage": "https://github.com/projekt-zespolowy-ALR/AuthService#readme",
+	"homepage": "https://github.com/projekt-zespolowy-ALR/wlosiara-pl-auth-service#readme",
 	"devDependencies": {
 		"@j-ulrich/release-it-regex-bumper": "^4.1.1",
 		"@nestjs/testing": "^9.2.0",

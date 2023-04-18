@@ -1,6 +1,6 @@
 apiVersion: v2
-name: authservice
-description: Helm chart for Włosiara.pl AuthService
+name: wlosiara-pl-auth-service
+description: Helm chart for Włosiara.pl auth service
 
 # A chart can be either an 'application' or a 'library' chart.
 #
