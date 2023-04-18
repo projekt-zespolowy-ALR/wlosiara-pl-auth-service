@@ -1,6 +1,6 @@
-import * as dotenv from "dotenv";
-import * as path from "path";
-dotenv.config({path: path.join(__dirname, ".env.test")});
+import * as Dotenv from "dotenv";
+import * as Path from "path";
+Dotenv.config({path: Path.join(__dirname, ".env.test")});
 import {Test} from "@nestjs/testing";
 import {describe, test, expect, beforeEach, afterEach} from "@jest/globals";
 import HelloModule from "../../../src/features/hello/HelloModule.js";

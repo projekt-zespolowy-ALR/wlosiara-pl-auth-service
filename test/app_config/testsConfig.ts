@@ -1,10 +1,10 @@
-import * as dotenv from "dotenv";
-import * as path from "path";
-dotenv.config({path: path.join(__dirname, "..", ".env.test")});
+import * as Dotenv from "dotenv";
+import * as Path from "path";
+Dotenv.config({path: Path.join(__dirname, "..", ".env.test")});
 
 import testsConfigSchema from "./testsConfigSchema.js";
-import * as envalid from "envalid";
+import * as Envalid from "envalid";
 
-const testsConfig = envalid.cleanEnv(process.env, testsConfigSchema);
+const testsConfig = Envalid.cleanEnv(process.env, testsConfigSchema);
 
 export default testsConfig;
