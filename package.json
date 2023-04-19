@@ -42,7 +42,7 @@
 		"@j-ulrich/release-it-regex-bumper": "^4.1.1",
 		"@nestjs/testing": "^9.2.0",
 		"@types/bcrypt": "^5.0.0",
-		"@types/jest": "^29.5.0",
+		"@types/jest": "^29.5.1",
 		"@types/node": "^18.15.3",
 		"@typescript-eslint/eslint-plugin": "^5.57.1",
 		"@typescript-eslint/parser": "^5.57.1",
