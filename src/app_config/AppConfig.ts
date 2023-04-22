@@ -2,15 +2,6 @@ import {IsInt, IsString, Min, Max} from "class-validator";
 import {Type} from "class-transformer";
 
 class AppConfig {
-	// Required setting
-	// @IsString()
-	// public readonly CUSTOM_HELLO!: string;
-
-	// Optional setting
-	@Type(() => String)
-	@IsString()
-	public readonly CUSTOM_HELLO: string = "Hello customizable world!";
-
 	@Type(() => Number)
 	@IsInt()
 	@Min(1)

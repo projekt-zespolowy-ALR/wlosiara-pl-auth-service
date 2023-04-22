@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: "{{ .Release.Name }}"
-          image: "{{ required `A valid image repository is required` .Values.image.repository | }}:{{ .Chart.AppVersion }}"
+          image: '{{ required "image.dockerRegistry.host is required" .Values.image.dockerRegistry.host }}/{{ .Release.Name }}:{{ .Chart.AppVersion }}'
           imagePullPolicy: Always
           resources:
             limits:
