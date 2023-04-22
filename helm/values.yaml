@@ -3,10 +3,11 @@ port: 3000
 postgresql:
   auth:
     database: "wlosiara-pl-auth-service"
-    username: "wlosiara-pl-auth-service"
+    username: "products-service"
   primary:
     initdb:
-      scripts-configmap: "wlosiara-pl-auth-service-postgresql-initdb-scripts"
+      scripts-configmap: "wlosiara-pl-auth-service-initdb-scripts"
 
 image:
-  repository: null
+  dockerRegistry:
+    host: null # required
