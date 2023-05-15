@@ -1,10 +1,10 @@
 import {Injectable} from "@nestjs/common";
 import {Repository} from "typeorm";
-import CredentialsEntity from "./CredentialsEntity.js";
-import CredentialsInRequest from "./CredentialsInRequest.js";
+import type CredentialsEntity from "./CredentialsEntity.js";
+import type CredentialsInRequest from "./CredentialsInRequest.js";
 import {hashPassword} from "./utils.js";
 import bcrypt from "bcrypt";
-import SessionEntity from "./SessionEntity.js";
+import type SessionEntity from "./SessionEntity.js";
 
 @Injectable()
 class AuthService {

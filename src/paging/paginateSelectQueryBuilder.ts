@@ -1,5 +1,5 @@
 import type {SelectQueryBuilder, ObjectLiteral} from "typeorm";
-import Page from "./Page.js";
+import type Page from "./Page.js";
 import type PagingOptions from "./PagingOptions.js";
 import buildPage from "./buildPage.js";
 

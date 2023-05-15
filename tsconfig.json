@@ -27,7 +27,7 @@
 		"emitBOM": false,
 		"emitDeclarationOnly": false,
 		"importHelpers": true,
-		"importsNotUsedAsValues": "remove",
+		"importsNotUsedAsValues": "error",
 		"inlineSourceMap": false,
 		"inlineSources": false,
 		"newLine": "lf",

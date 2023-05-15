@@ -1,7 +1,7 @@
 import {Body, Controller, Post, UsePipes, ValidationPipe, Version} from "@nestjs/common";
 import CredentialsInRequest from "./CredentialsInRequest.js";
 import AuthService from "./AuthService.js";
-import SessionEntity from "./SessionEntity.js";
+import type SessionEntity from "./SessionEntity.js";
 
 @Controller("/auth")
 export default class AuthController {

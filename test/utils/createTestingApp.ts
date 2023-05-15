@@ -1,4 +1,4 @@
-import {TestingModule} from "@nestjs/testing";
+import type {TestingModule} from "@nestjs/testing";
 import {FastifyAdapter, type NestFastifyApplication} from "@nestjs/platform-fastify";
 import initializeApp from "../../src/initializeApp.js";
 
