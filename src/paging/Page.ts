@@ -1,4 +1,4 @@
-import PageMeta from "./PageMeta.js";
+import type PageMeta from "./PageMeta.js";
 import {plainToClass} from "class-transformer";
 
 class Page<T> {

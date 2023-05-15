@@ -1,6 +1,6 @@
 import {plainToClass} from "class-transformer";
 import Page from "./Page.js";
-import PageMeta from "./PageMeta.js";
+import type PageMeta from "./PageMeta.js";
 
 export default function buildPage<T>({
 	items,
