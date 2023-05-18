@@ -7,7 +7,19 @@ postgresql:
   primary:
     initdb:
       scripts-configmap: "wlosiara-pl-auth-service-initdb-scripts"
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "128Mi"
 
 image:
   dockerRegistry:
     host: null # required
+
+resources:
+  requests:
+    cpu: "50m"
+    memory: "128Mi"
+  limits:
+    cpu: "100m"
+    memory: "256Mi"
