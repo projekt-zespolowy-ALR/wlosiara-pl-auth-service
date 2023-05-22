@@ -6,7 +6,7 @@ import {Module} from "@nestjs/common";
 	providers: [],
 })
 class FeaturesModule {
-	constructor() {}
+	public constructor() {}
 }
 
 export default FeaturesModule;
