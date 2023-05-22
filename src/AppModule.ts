@@ -10,7 +10,7 @@ import FeaturesModule from "./features/FeaturesModule.js";
 	providers: [],
 })
 class AppModule {
-	constructor() {}
+	public constructor() {}
 }
 
 export default AppModule;
