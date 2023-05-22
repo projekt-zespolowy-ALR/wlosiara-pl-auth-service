@@ -1,7 +1,8 @@
 import {Module} from "@nestjs/common";
+import AuthModule from "./auth/auth_module/AuthModule.js";
 
 @Module({
-	imports: [],
+	imports: [AuthModule],
 	controllers: [],
 	providers: [],
 })
