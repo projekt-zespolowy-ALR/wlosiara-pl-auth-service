@@ -11,3 +11,4 @@ node_modules/
 .vscode/
 /coverage_report/
 /helm/charts/
+.idea/
