@@ -3,5 +3,5 @@ export default class RegisterUserPayload {
 
 	public readonly hashedPassword!: string;
 
-	public readonly userId!: string;
+	public readonly username!: string;
 }
