@@ -80,21 +80,30 @@ describe("Auth", () => {
 		await Promise.all([postgresqlContainer.stop(), app.close()]);
 	});
 	describe("v1", () => {
-		describe("POST /auth/v1/register", () => {
-			test("should return 201 CREATED", async () => {
-				const requestData = {
-					email: "test.email@example.com",
-					username: "test-username",
-					password: "test-hashed-password",
-				};
+		describe("POST /v1/auth/register", () => {
+			describe("when called with valid data", () => {
+				test("should return 201 CREATED", async () => {
+					const requestData = {
+						email: "test.email@example.com",
+						username: "test-username",
+						password: "test-hashed-password",
+					};
+					usersMicroserviceClientMock.requestUserCreation =
+						async function (): Promise<RegisterUserResponse> {
+							return Promise.resolve({
+								userId: "f37c6620-db6f-4ff4-8e90-d215219891c9",
+								username: "test-username",
+							});
+						};
 
-				// usemocker
-				const response = await app.inject({
-					method: "POST",
-					url: "/auth/v1/register",
-					payload: requestData,
+					// usemocker
+					const response = await app.inject({
+						method: "POST",
+						url: "/v1/auth/register",
+						payload: requestData,
+					});
+					expect(response.statusCode).toBe(201);
 				});
-				expect(response.statusCode).toBe(201);
 			});
 		});
 	});
