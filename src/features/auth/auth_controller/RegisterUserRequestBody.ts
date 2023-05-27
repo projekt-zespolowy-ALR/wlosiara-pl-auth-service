@@ -1,4 +1,4 @@
-import {IsEmail, IsNotEmpty, IsString, IsUUID, MaxLength, MinLength} from "class-validator";
+import {IsEmail, IsNotEmpty, IsString, MaxLength, MinLength} from "class-validator";
 
 export default class RegisterUserRequestBody {
 	@IsNotEmpty()
