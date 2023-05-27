@@ -29,6 +29,10 @@ class AppConfig {
 	@Type(() => String)
 	@IsString()
 	public readonly POSTGRES_DATABASE: string = "postgres";
+
+	@Type(() => String)
+	@IsString()
+	public readonly USERS_MICROSERVICE_BASE_URL!: string;
 }
 
 export default AppConfig;
