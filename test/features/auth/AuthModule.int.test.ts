@@ -14,6 +14,7 @@ import FeaturesModule from "../../../src/features/FeaturesModule.js";
 import UsersMicroserviceReference from "../../../src/features/auth/auth_service/UsersMicroserviceReference.js";
 import type RegisterUserResponse from "../../../src/features/auth/auth_service/RegisterUserResponse.js";
 import UsersMicroserviceReferenceUsernameAlreadyUsedError from "../../../src/features/auth/auth_service/UsersMicroserviceReferenceUsernameAlreadyUsedError.js";
+import UsersMicroserviceReferenceInternalError from "../../../src/features/auth/auth_service/UsersMicroserviceReferenceInternalError.js";
 
 describe("Auth", () => {
 	let postgresqlContainer: Testcontainers.StartedPostgreSqlContainer;
@@ -96,13 +97,223 @@ describe("Auth", () => {
 							});
 						};
 
-					// usemocker
 					const response = await app.inject({
 						method: "POST",
 						url: "/v1/auth/register",
 						payload: requestData,
 					});
 					expect(response.statusCode).toBe(201);
+				});
+			});
+			describe("when called with valid data, but email is already registered", () => {
+				test("should return 409 CONFLICT", async () => {
+					const requestData = {
+						email: "test.email@example.com",
+						username: "test0test",
+						password: "test-hashed-password",
+					};
+					usersMicroserviceClientMock.requestUserCreation =
+						async function (): Promise<RegisterUserResponse> {
+							return Promise.resolve({
+								userId: "e7c46327-ea2e-49b6-a761-eaa18a5c3de1",
+								username: "test0test",
+							});
+						};
+
+					const response = await app.inject({
+						method: "POST",
+						url: "/v1/auth/register",
+						payload: requestData,
+					});
+
+					const request_02_data = {
+						email: "test.email@example.com",
+						username: "test-username",
+						password: "test-hashed-password",
+					};
+
+					const response_02 = await app.inject({
+						method: "POST",
+						url: "/v1/auth/register",
+						payload: request_02_data,
+					});
+
+					expect(response.statusCode).toBe(201);
+					expect(response_02.statusCode).toBe(409);
+				});
+			});
+			describe("when called with valid data, but username is already used", () => {
+				test("should return 409 CONFLICT", async () => {
+					const requestData = {
+						email: "test.email@example.com",
+						username: "test",
+						password: "test-hashed-password",
+					};
+
+					usersMicroserviceClientMock.requestUserCreation =
+						async function (): Promise<RegisterUserResponse> {
+							return Promise.resolve({
+								userId: "e7c46327-ea2e-49b6-a761-eaa18a5c3de1",
+								username: "test",
+							});
+						};
+
+					const response = await app.inject({
+						method: "POST",
+						url: "/v1/auth/register",
+						payload: requestData,
+					});
+
+					const request_02_data = {
+						email: "test2.email@example.com",
+						username: "test",
+						password: "test-hashed-password",
+					};
+
+					usersMicroserviceClientMock.requestUserCreation =
+						async function (): Promise<RegisterUserResponse> {
+							throw new UsersMicroserviceReferenceUsernameAlreadyUsedError(
+								request_02_data.username
+							);
+						};
+
+					const response_02 = await app.inject({
+						method: "POST",
+						url: "/v1/auth/register",
+						payload: request_02_data,
+					});
+
+					expect(response.statusCode).toBe(201);
+					expect(response_02.statusCode).toBe(409);
+				});
+			});
+			describe("when called with invalid data", () => {
+				test("email is a number: should return 400 BAD REQUEST", async () => {
+					const requestData = {
+						email: 123,
+						username: "test-username",
+						password: "test-hashed-password",
+					};
+
+					const response = await app.inject({
+						method: "POST",
+						url: "/v1/auth/register",
+						payload: requestData,
+					});
+
+					expect(response.statusCode).toBe(400);
+				});
+				test("email is not valid: should return 400 BAD REQUEST", async () => {
+					const requestData = {
+						email: "dddd",
+						username: "test-username",
+						password: "test-hashed-password",
+					};
+
+					const response = await app.inject({
+						method: "POST",
+						url: "/v1/auth/register",
+						payload: requestData,
+					});
+
+					expect(response.statusCode).toBe(400);
+				});
+
+				test("password is too short: should return 400 BAD REQUEST", async () => {
+					const requestData = {
+						email: "test@test.com",
+						username: "test-username",
+						password: "test",
+					};
+
+					const response = await app.inject({
+						method: "POST",
+						url: "/v1/auth/register",
+						payload: requestData,
+					});
+
+					expect(response.statusCode).toBe(400);
+				});
+
+				test("password is too long: should return 400 BAD REQUEST", async () => {
+					const requestData = {
+						email: "test@test.com",
+						username: "test-username",
+						password: "test".repeat(100),
+					};
+
+					const response = await app.inject({
+						method: "POST",
+						url: "/v1/auth/register",
+						payload: requestData,
+					});
+
+					expect(response.statusCode).toBe(400);
+				});
+			});
+
+			describe("when called with missing data", () => {
+				test("should return 400 BAD REQUEST", async () => {
+					const requestData = {
+						username: "test-username",
+						password: "test-hashed-password",
+					};
+
+					const response = await app.inject({
+						method: "POST",
+						url: "/v1/auth/register",
+						payload: requestData,
+					});
+
+					expect(response.statusCode).toBe(400);
+				});
+			});
+
+			describe("when users microservice is down", () => {
+				test("should return 500 INTERNAL SERVER ERROR", async () => {
+					const requestData = {
+						email: "email@email.com",
+						username: "test-username",
+						password: "test-hashed-password",
+					};
+
+					usersMicroserviceClientMock.requestUserCreation =
+						async function (): Promise<RegisterUserResponse> {
+							throw new UsersMicroserviceReferenceInternalError();
+						};
+
+					const response = await app.inject({
+						method: "POST",
+						url: "/v1/auth/register",
+						payload: requestData,
+					});
+
+					expect(response.statusCode).toBe(500);
+				});
+			});
+
+			describe("when users microservice throws random error", () => {
+				test("should return the error", async () => {
+					const requestData = {
+						email: "email@email.com",
+						username: "test-username",
+						password: "test-hashed-password",
+					};
+
+					const randomError = new Error("random error");
+
+					usersMicroserviceClientMock.requestUserCreation =
+						async function (): Promise<RegisterUserResponse> {
+							throw randomError;
+						};
+
+					const response = await app.inject({
+						method: "POST",
+						url: "/v1/auth/register",
+						payload: requestData,
+					});
+
+					expect(response.statusCode).toBe(500);
 				});
 			});
 		});
