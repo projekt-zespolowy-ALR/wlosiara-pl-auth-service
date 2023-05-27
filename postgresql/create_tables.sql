@@ -5,5 +5,4 @@ CREATE TABLE user_credentials (
     hashed_password TEXT NOT NULL,
     user_id UUID NOT NULL,
     PRIMARY KEY (id)
-    );
-)
+);
