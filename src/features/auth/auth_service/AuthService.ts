@@ -22,8 +22,8 @@ export default class AuthService {
 	private usersMicroserviceReference: UsersMicroserviceReference;
 	public constructor(
 		@InjectRepository(UserCredentialsEntity)
-		@InjectRepository(UserSessionEntity)
 		userCredentialsRepository: Repository<UserCredentialsEntity>,
+		@InjectRepository(UserSessionEntity)
 		userSessionRepository: Repository<UserSessionEntity>,
 		usersMicroserviceReference: UsersMicroserviceReference,
 		appConfig: AppConfig

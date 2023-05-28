@@ -6,5 +6,5 @@ export default class LoginUserRequestBody {
 	public readonly email!: string;
 
 	@IsNotEmpty()
-	public readonly hashedPassword!: string;
+	public readonly password!: string;
 }
