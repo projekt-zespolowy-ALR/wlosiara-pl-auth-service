@@ -65,6 +65,7 @@ describe("Auth", () => {
 				POSTGRES_PASSWORD: postgresqlContainer.getPassword(),
 				POSTGRES_DATABASE: postgresqlContainer.getDatabase(),
 				USERS_MICROSERVICE_BASE_URL: "http://users-microservice",
+				TOKEN_LENGTH: 16,
 			}),
 		});
 		const appModule = await Test.createTestingModule({
@@ -314,6 +315,142 @@ describe("Auth", () => {
 					});
 
 					expect(response.statusCode).toBe(500);
+				});
+			});
+		});
+		describe("POST /v1/auth/login", () => {
+			describe("when called with valid data & user is registered", () => {
+				test("should return 201 CREATED", async () => {
+					const requestData = {
+						email: "test@test.com",
+						username: "test-username",
+						password: "test-password",
+					};
+
+					usersMicroserviceClientMock.requestUserCreation =
+						async function (): Promise<RegisterUserResponse> {
+							return Promise.resolve({
+								userId: "e7c46327-ea2e-49b6-a761-eaa18a5c3de1",
+								username: "test-username",
+							});
+						};
+					await app.inject({
+						method: "POST",
+						url: "/v1/auth/register",
+						payload: requestData,
+					});
+
+					const loginResponse = await app.inject({
+						method: "POST",
+						url: "/v1/auth/login",
+						payload: {
+							email: requestData.email,
+							password: requestData.password,
+						},
+					});
+					expect(loginResponse.statusCode).toBe(201);
+				});
+			});
+			describe("when called with valid data & user is not registered", () => {
+				test("should return 400 BAD REQUEST", async () => {
+					const requestData = {
+						email: "test@example.com",
+						password: "test-password",
+					};
+
+					const loginResponse = await app.inject({
+						method: "POST",
+						url: "/v1/auth/login",
+						payload: {
+							...requestData,
+						},
+					});
+
+					expect(loginResponse.statusCode).toBe(400);
+				});
+			});
+			describe("when user is registered but password is wrong", () => {
+				test("should return 400 BAD REQUEST", async () => {
+					const requestData = {
+						email: "test@test.com",
+						username: "test-username",
+						password: "test-password",
+					};
+
+					usersMicroserviceClientMock.requestUserCreation =
+						async function (): Promise<RegisterUserResponse> {
+							return Promise.resolve({
+								userId: "e7c46327-ea2e-49b6-a761-eaa18a5c3de1",
+								username: "test-username",
+							});
+						};
+					await app.inject({
+						method: "POST",
+						url: "/v1/auth/register",
+						payload: requestData,
+					});
+
+					const loginResponse = await app.inject({
+						method: "POST",
+						url: "/v1/auth/login",
+						payload: {
+							email: requestData.email,
+							password: "different-password",
+						},
+					});
+					expect(loginResponse.statusCode).toBe(400);
+				});
+			});
+			describe("when called with invalid data: email is missing", () => {
+				test("should return 400 BAD REQUEST", async () => {
+					const requestData = {
+						password: "test-password",
+					};
+
+					const loginResponse = await app.inject({
+						method: "POST",
+						url: "/v1/auth/login",
+						payload: {
+							...requestData,
+						},
+					});
+
+					expect(loginResponse.statusCode).toBe(400);
+				});
+			});
+			describe("when called with invalid data: password is missing", () => {
+				test("should return 400 BAD REQUEST", async () => {
+					const requestData = {
+						email: "test@email.com",
+					};
+
+					const loginResponse = await app.inject({
+						method: "POST",
+						url: "/v1/auth/login",
+						payload: {
+							...requestData,
+						},
+					});
+
+					expect(loginResponse.statusCode).toBe(400);
+				});
+			});
+			describe("when called with invalid data: email is not valid", () => {
+				test("should return 400 BAD REQUEST", async () => {
+					const requestData = {
+						email: "test",
+						password: "test-password",
+					};
+
+					const loginResponse = await app.inject({
+						method: "POST",
+						url: "/v1/auth/login",
+						payload: {
+							...requestData,
+						},
+					});
+
+					expect(loginResponse.statusCode).toBe(400);
 				});
 			});
 		});

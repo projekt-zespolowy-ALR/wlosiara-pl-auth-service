@@ -33,6 +33,11 @@ class AppConfig {
 	@Type(() => String)
 	@IsString()
 	public readonly USERS_MICROSERVICE_BASE_URL!: string;
+
+	@Type(() => Number)
+	@IsInt()
+	@Min(8)
+	public readonly TOKEN_LENGTH: number = 16;
 }
 
 export default AppConfig;
