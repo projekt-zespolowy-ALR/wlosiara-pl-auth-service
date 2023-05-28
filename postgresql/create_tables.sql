@@ -6,3 +6,10 @@ CREATE TABLE user_credentials (
     user_id UUID NOT NULL,
     PRIMARY KEY (id)
 );
+
+CREATE TABLE user_sessions (
+    id UUID DEFAULT uuid_generate_v4() NOT NULL,
+    user_id UUID NOT NULL,
+    token TEXT NOT NULL,
+    PRIMARY KEY (id)
+)

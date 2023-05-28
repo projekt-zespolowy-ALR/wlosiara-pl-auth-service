@@ -8,18 +8,30 @@ import UsersMicroserviceReferenceUsernameAlreadyUsedError from "./UsersMicroserv
 import UsersMicroserviceReferenceInternalError from "./UsersMicroserviceReferenceInternalError.js";
 import EmailAlreadyExistsError from "./EmailAlreadyExistsError.js";
 import argon2 from "argon2";
+import type LoginUserPayload from "./LoginUserPayload.js";
+import EmailOrPasswordInvalidError from "./EmailOrPasswordInvalidError.js";
+import UserSessionEntity from "./UserSessionEntity.js";
+import * as crypto from "crypto";
+import AppConfig from "../../../app_config/AppConfig.js";
 @Injectable()
 export default class AuthService {
+	private readonly appConfig: AppConfig;
 	private readonly userCredentialsRepository: Repository<UserCredentialsEntity>;
+	private readonly userSessionRepository: Repository<UserSessionEntity>;
 
 	private usersMicroserviceReference: UsersMicroserviceReference;
 	public constructor(
 		@InjectRepository(UserCredentialsEntity)
+		@InjectRepository(UserSessionEntity)
 		userCredentialsRepository: Repository<UserCredentialsEntity>,
-		usersMicroserviceReference: UsersMicroserviceReference
+		userSessionRepository: Repository<UserSessionEntity>,
+		usersMicroserviceReference: UsersMicroserviceReference,
+		appConfig: AppConfig
 	) {
 		this.userCredentialsRepository = userCredentialsRepository;
+		this.userSessionRepository = userSessionRepository;
 		this.usersMicroserviceReference = usersMicroserviceReference;
+		this.appConfig = appConfig;
 	}
 
 	public async registerUser(userCredentials: RegisterUserPayload): Promise<UserCredentialsEntity> {
@@ -53,5 +65,25 @@ export default class AuthService {
 			}
 			throw error;
 		}
+	}
+
+	public async loginUser(userCredentials: LoginUserPayload): Promise<UserSessionEntity> {
+		const userCredentialsEntity = await this.userCredentialsRepository.findOne({
+			where: {
+				email: userCredentials.email,
+			},
+		});
+		if (!userCredentialsEntity) {
+			throw new EmailOrPasswordInvalidError(userCredentials.email);
+		}
+		if (!(await argon2.verify(userCredentialsEntity.hashedPassword, userCredentials.password))) {
+			throw new EmailOrPasswordInvalidError(userCredentials.email);
+		}
+
+		const token = crypto.randomBytes(this.appConfig.TOKEN_LENGTH).toString("hex");
+		return this.userSessionRepository.save({
+			token: token,
+			userId: userCredentialsEntity.userId,
+		});
 	}
 }
