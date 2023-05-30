@@ -13,6 +13,9 @@ import EmailOrPasswordInvalidError from "./EmailOrPasswordInvalidError.js";
 import UserSessionEntity from "./UserSessionEntity.js";
 import * as crypto from "crypto";
 import AppConfig from "../../../app_config/AppConfig.js";
+import type UserCredentials from "../auth_controller/UserCredentials.js";
+import type UserSession from "../auth_controller/UserSession.js";
+import SessionNotFoundError from "./SessionNotFoundError.js";
 @Injectable()
 export default class AuthService {
 	private readonly appConfig: AppConfig;
@@ -34,7 +37,7 @@ export default class AuthService {
 		this.appConfig = appConfig;
 	}
 
-	public async registerUser(userCredentials: RegisterUserPayload): Promise<UserCredentialsEntity> {
+	public async registerUser(userCredentials: RegisterUserPayload): Promise<UserCredentials> {
 		if (
 			await this.userCredentialsRepository.findOne({
 				where: {
@@ -67,7 +70,7 @@ export default class AuthService {
 		}
 	}
 
-	public async loginUser(userCredentials: LoginUserPayload): Promise<UserSessionEntity> {
+	public async loginUser(userCredentials: LoginUserPayload): Promise<UserSession> {
 		const userCredentialsEntity = await this.userCredentialsRepository.findOne({
 			where: {
 				email: userCredentials.email,
@@ -85,5 +88,34 @@ export default class AuthService {
 			token: token,
 			userId: userCredentialsEntity.userId,
 		});
+	}
+
+	public async logoutUser(token: string): Promise<void> {
+		console.log(`Jestem w serwisie. token to: ${token}`);
+		const sessionEntity = await this.findUserSessionByToken(token);
+		if (sessionEntity !== null) {
+			console.log(`session entity != null: ${sessionEntity}`);
+			await this.userSessionRepository.delete({
+				token: sessionEntity.token,
+			});
+			return Promise.resolve();
+		} else {
+			console.log(`session entity: ${sessionEntity}`);
+			throw new SessionNotFoundError();
+		}
+	}
+
+	public async findUserSessionByToken(token: string): Promise<UserSessionEntity | null> {
+		console.log(`Jestem w find, token to: ${token}`);
+		// if token is not null or undefined
+		if (token) {
+			const parsedToken = token.split(" ")[1] as string;
+			return await this.userSessionRepository.findOne({
+				where: {
+					token: parsedToken,
+				},
+			});
+		}
+		return null;
 	}
 }

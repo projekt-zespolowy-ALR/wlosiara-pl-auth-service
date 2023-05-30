@@ -454,5 +454,62 @@ describe("Auth", () => {
 				});
 			});
 		});
+		describe("POST /v1/auth/logout", () => {
+			describe("when user is logged in", () => {
+				test("should return 201 OK", async () => {
+					const requestData = {
+						email: "email@example.com",
+						password: "test-password",
+						username: "test-username",
+					};
+
+					usersMicroserviceClientMock.requestUserCreation =
+						async function (): Promise<RegisterUserResponse> {
+							return Promise.resolve({
+								userId: "e7c46327-ea2e-49b6-a761-eaa18a5c3de1",
+								username: "test-username",
+							});
+						};
+
+					await app.inject({
+						method: "POST",
+						url: "/v1/auth/register",
+						payload: requestData,
+					});
+
+					const loginResponse = await app.inject({
+						method: "POST",
+						url: "/v1/auth/login",
+						payload: {
+							email: requestData.email,
+							password: requestData.password,
+						},
+					});
+
+					const token = loginResponse.json().token;
+
+					const logoutResponse = await app.inject({
+						method: "POST",
+						url: "/v1/auth/logout",
+						headers: {
+							Authorization: `Bearer ${token}`,
+						},
+					});
+					expect(token).not.toBeNull();
+					expect(logoutResponse.statusCode).toBe(201);
+				});
+			});
+
+			describe("when user is not logged in and tries to log out", () => {
+				test("should return 401 UNAUTHORIZED", async () => {
+					const logoutResponse = await app.inject({
+						method: "POST",
+						url: "/v1/auth/logout",
+					});
+
+					expect(logoutResponse.statusCode).toBe(401);
+				});
+			});
+		});
 	});
 });

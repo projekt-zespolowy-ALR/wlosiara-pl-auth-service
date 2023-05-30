@@ -5,6 +5,8 @@ import {
 	ValidationPipe,
 	ConflictException,
 	BadRequestException,
+	Headers,
+	UnauthorizedException,
 } from "@nestjs/common";
 import AuthService from "../auth_service/AuthService.js";
 import RegisterUserRequestBody from "./RegisterUserRequestBody.js";
@@ -15,6 +17,7 @@ import UsersMicroserviceReferenceUsernameAlreadyUsedError from "../auth_service/
 import LoginUserRequestBody from "./LoginUserRequestBody.js";
 import payloadifyLoginUserRequestBody from "./PayloadifyLoginUserRequestBody.js";
 import EmailOrPasswordInvalidError from "../auth_service/EmailOrPasswordInvalidError.js";
+import SessionNotFoundError from "../auth_service/SessionNotFoundError.js";
 @Controller("/auth")
 export default class AuthController {
 	private readonly authService: AuthService;
@@ -65,6 +68,17 @@ export default class AuthController {
 				throw new BadRequestException(error.message);
 			}
 			throw error;
+		}
+	}
+
+	@Post("/logout")
+	public async logoutUser(@Headers("authorization") token: string) {
+		try {
+			await this.authService.logoutUser(token);
+		} catch (error) {
+			if (error instanceof SessionNotFoundError) {
+				throw new UnauthorizedException(error.message);
+			}
 		}
 	}
 }
