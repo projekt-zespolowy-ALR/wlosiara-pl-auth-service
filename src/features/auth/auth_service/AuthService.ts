@@ -16,6 +16,7 @@ import AppConfig from "../../../app_config/AppConfig.js";
 import type UserCredentials from "../auth_controller/UserCredentials.js";
 import type UserSession from "../auth_controller/UserSession.js";
 import SessionNotFoundError from "./SessionNotFoundError.js";
+
 @Injectable()
 export default class AuthService {
 	private readonly appConfig: AppConfig;
@@ -91,23 +92,18 @@ export default class AuthService {
 	}
 
 	public async logoutUser(token: string): Promise<void> {
-		console.log(`Jestem w serwisie. token to: ${token}`);
 		const sessionEntity = await this.findUserSessionByToken(token);
 		if (sessionEntity !== null) {
-			console.log(`session entity != null: ${sessionEntity}`);
 			await this.userSessionRepository.delete({
 				token: sessionEntity.token,
 			});
 			return Promise.resolve();
 		} else {
-			console.log(`session entity: ${sessionEntity}`);
 			throw new SessionNotFoundError();
 		}
 	}
 
-	public async findUserSessionByToken(token: string): Promise<UserSessionEntity | null> {
-		console.log(`Jestem w find, token to: ${token}`);
-		// if token is not null or undefined
+	private async findUserSessionByToken(token: string): Promise<UserSessionEntity | null> {
 		if (token) {
 			const parsedToken = token.split(" ")[1] as string;
 			return await this.userSessionRepository.findOne({
@@ -115,6 +111,14 @@ export default class AuthService {
 					token: parsedToken,
 				},
 			});
+		}
+		return null;
+	}
+
+	public async getCurrentUser(token: string): Promise<string | null> {
+		const sessionEntity = await this.findUserSessionByToken(token);
+		if (sessionEntity !== null && sessionEntity.userId !== null) {
+			return sessionEntity.userId;
 		}
 		return null;
 	}

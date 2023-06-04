@@ -7,6 +7,7 @@ import {
 	BadRequestException,
 	Headers,
 	UnauthorizedException,
+	Get,
 } from "@nestjs/common";
 import AuthService from "../auth_service/AuthService.js";
 import RegisterUserRequestBody from "./RegisterUserRequestBody.js";
@@ -78,6 +79,24 @@ export default class AuthController {
 		} catch (error) {
 			if (error instanceof SessionNotFoundError) {
 				throw new UnauthorizedException(error.message);
+			}
+		}
+	}
+
+	@Get("/me")
+	public async getCurrentUser(@Headers("authorization") token: string) {
+		try {
+			const userId = await this.authService.getCurrentUser(token);
+			if (userId) {
+				return {userId};
+			} else {
+				throw new UnauthorizedException();
+			}
+		} catch (error) {
+			if (error instanceof SessionNotFoundError) {
+				throw new UnauthorizedException(error.message);
+			} else {
+				throw error;
 			}
 		}
 	}
