@@ -511,5 +511,64 @@ describe("Auth", () => {
 				});
 			});
 		});
+		describe("POST /v1/auth/me", () => {
+			describe("when user is logged in", () => {
+				test("should return 200 OK", async () => {
+					const requestData = {
+						email: "test@mail.com",
+						password: "test-password",
+						username: "test-username",
+					};
+
+					usersMicroserviceClientMock.requestUserCreation =
+						async function (): Promise<RegisterUserResponse> {
+							return Promise.resolve({
+								userId: "e7c46327-ea2e-49b6-a761-eaa18a5c3de1",
+								username: "test-username",
+							});
+						};
+
+					await app.inject({
+						method: "POST",
+						url: "/v1/auth/register",
+						payload: requestData,
+					});
+
+					const loginResponse = await app.inject({
+						method: "POST",
+						url: "/v1/auth/login",
+						payload: {
+							email: requestData.email,
+							password: requestData.password,
+						},
+					});
+
+					const token = loginResponse.json().token;
+
+					const meResponse = await app.inject({
+						method: "GET",
+						url: "/v1/auth/me",
+						headers: {
+							Authorization: `Bearer ${token}`,
+						},
+					});
+
+					expect(token).not.toBeNull();
+					console.log(meResponse.json());
+					expect(meResponse.statusCode).toBe(200);
+				});
+			});
+
+			describe("when user is not logged in and tries to get their data", () => {
+				test("should return 401 UNAUTHORIZED", async () => {
+					const meResponse = await app.inject({
+						method: "GET",
+						url: "/v1/auth/me",
+					});
+
+					expect(meResponse.statusCode).toBe(401);
+				});
+			});
+		});
 	});
 });
