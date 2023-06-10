@@ -188,7 +188,7 @@ jobs:
           version: ${{ env.SETUP_HELM_HELM_VERSION }}
       - name: Add Włosiara.pl ChartMuseum repository
         run: |
-          helm repo add wlosiara-pl-chartmuseum ${{ vars.CHARTMUSEUM_URL }}
+          helm repo add wlosiara-pl-chartmuseum ${{ vars.CHARTMUSEUM_URL }} --username=${{ secrets.CHARTMUSEUM_USERNAME }} --password=${{ secrets.CHARTMUSEUM_PASSWORD }}
       - name: Install push-cm plugin for Helm
         run: |
           helm plugin install https://github.com/chartmuseum/helm-push
