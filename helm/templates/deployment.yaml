@@ -56,3 +56,8 @@ spec:
                 secretKeyRef:
                   name: "{{ .Release.Name }}"
                   key: POSTGRES_DATABASE
+            - name: USERS_MICROSERVICE_BASE_URL
+              valueFrom:
+                configMapKeyRef:
+                name: "{{ .Release.Name }}"
+                key: USERS_MICROSERVICE_BASE_URL
