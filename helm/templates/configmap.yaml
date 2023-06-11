@@ -6,3 +6,4 @@ metadata:
     app: "{{ .Release.Name }}"
 data:
   PORT: "{{ .Values.port }}"
+  USERS_MICROSERVICE_BASE_URL: "{{ .Values.usersMicroserviceBaseUrl }}"
