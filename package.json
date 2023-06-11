@@ -1,6 +1,6 @@
 {
 	"name": "wlosiara-pl-auth-service",
-	"version": "2.0.0",
+	"version": "2.0.1",
 	"description": "Włosiara.pl - wlosiara-pl-auth-service",
 	"private": true,
 	"main": "./dist/src/main.js",
