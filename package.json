@@ -26,7 +26,7 @@
 		"release": "release-it",
 		"hadolint:check": "hadolint Dockerfile",
 		"helm-lint:check": "helm lint helm",
-		"helm-package": "helm dependency build helm && helm package helm"
+		"helm-package": "helm dependency build helm && cp -r ./postgresql/ ./helm/ && helm package ./helm/ && rm -rf ./helm/postgresql"
 	},
 	"repository": {
 		"type": "git",
