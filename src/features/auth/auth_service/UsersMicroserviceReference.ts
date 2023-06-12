@@ -14,7 +14,10 @@ export default class UsersMicroserviceReference {
 	public requestUserCreation(username: string): Promise<RegisterUserResponse> {
 		return fetch(`${this.appConfig.USERS_MICROSERVICE_BASE_URL}/users`, {
 			method: "POST",
-			body: JSON.stringify({username}),
+			body: JSON.stringify({
+				username,
+				avatarUrl: "https://blog.kreditings.com/wp-content/uploads/2020/09/hair-png.png",
+			}),
 			headers: {
 				"Content-Type": "application/json",
 			},
