@@ -3,12 +3,12 @@ port: 3000
 postgresql:
   auth:
     database: "postgres"
-    username: "products-service"
+    username: "auth-service"
     password: null # required
   primary:
     initdb:
-      scriptsConfigMap: "wlosiara-pl-products-service-postgresql-initdb-scripts"
-      user: "wlosiara-pl-products-service"
+      scriptsConfigMap: "wlosiara-pl-auth-service-postgresql-initdb-scripts"
+      user: "wlosiara-pl-auth-service"
       password: null # required
     resources:
       requests:
