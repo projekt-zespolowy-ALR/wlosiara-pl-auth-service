@@ -12,7 +12,7 @@ export default class UsersMicroserviceReference {
 	}
 
 	public requestUserCreation(username: string): Promise<RegisterUserResponse> {
-		return fetch(`${this.appConfig.USERS_MICROSERVICE_BASE_URL}/register-user`, {
+		return fetch(`${this.appConfig.USERS_MICROSERVICE_BASE_URL}/users`, {
 			method: "POST",
 			body: JSON.stringify({username}),
 			headers: {
