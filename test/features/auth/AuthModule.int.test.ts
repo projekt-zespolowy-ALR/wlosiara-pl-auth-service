@@ -93,7 +93,7 @@ describe("Auth", () => {
 					usersMicroserviceClientMock.requestUserCreation =
 						async function (): Promise<RegisterUserResponse> {
 							return Promise.resolve({
-								userId: "f37c6620-db6f-4ff4-8e90-d215219891c9",
+								id: "f37c6620-db6f-4ff4-8e90-d215219891c9",
 								username: "test-username",
 							});
 						};
@@ -116,7 +116,7 @@ describe("Auth", () => {
 					usersMicroserviceClientMock.requestUserCreation =
 						async function (): Promise<RegisterUserResponse> {
 							return Promise.resolve({
-								userId: "e7c46327-ea2e-49b6-a761-eaa18a5c3de1",
+								id: "e7c46327-ea2e-49b6-a761-eaa18a5c3de1",
 								username: "test0test",
 							});
 						};
@@ -154,7 +154,7 @@ describe("Auth", () => {
 					usersMicroserviceClientMock.requestUserCreation =
 						async function (): Promise<RegisterUserResponse> {
 							return Promise.resolve({
-								userId: "e7c46327-ea2e-49b6-a761-eaa18a5c3de1",
+								id: "e7c46327-ea2e-49b6-a761-eaa18a5c3de1",
 								username: "test",
 							});
 						};
@@ -330,7 +330,7 @@ describe("Auth", () => {
 					usersMicroserviceClientMock.requestUserCreation =
 						async function (): Promise<RegisterUserResponse> {
 							return Promise.resolve({
-								userId: "e7c46327-ea2e-49b6-a761-eaa18a5c3de1",
+								id: "e7c46327-ea2e-49b6-a761-eaa18a5c3de1",
 								username: "test-username",
 							});
 						};
@@ -380,7 +380,7 @@ describe("Auth", () => {
 					usersMicroserviceClientMock.requestUserCreation =
 						async function (): Promise<RegisterUserResponse> {
 							return Promise.resolve({
-								userId: "e7c46327-ea2e-49b6-a761-eaa18a5c3de1",
+								id: "e7c46327-ea2e-49b6-a761-eaa18a5c3de1",
 								username: "test-username",
 							});
 						};
@@ -466,7 +466,7 @@ describe("Auth", () => {
 					usersMicroserviceClientMock.requestUserCreation =
 						async function (): Promise<RegisterUserResponse> {
 							return Promise.resolve({
-								userId: "e7c46327-ea2e-49b6-a761-eaa18a5c3de1",
+								id: "e7c46327-ea2e-49b6-a761-eaa18a5c3de1",
 								username: "test-username",
 							});
 						};
@@ -523,7 +523,7 @@ describe("Auth", () => {
 					usersMicroserviceClientMock.requestUserCreation =
 						async function (): Promise<RegisterUserResponse> {
 							return Promise.resolve({
-								userId: "e7c46327-ea2e-49b6-a761-eaa18a5c3de1",
+								id: "e7c46327-ea2e-49b6-a761-eaa18a5c3de1",
 								username: "test-username",
 							});
 						};

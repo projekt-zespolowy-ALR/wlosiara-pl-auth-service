@@ -13,7 +13,6 @@ import EmailOrPasswordInvalidError from "./EmailOrPasswordInvalidError.js";
 import UserSessionEntity from "./UserSessionEntity.js";
 import * as crypto from "crypto";
 import AppConfig from "../../../app_config/AppConfig.js";
-import type UserCredentials from "../auth_controller/UserCredentials.js";
 import type UserSession from "../auth_controller/UserSession.js";
 import SessionNotFoundError from "./SessionNotFoundError.js";
 
@@ -38,7 +37,7 @@ export default class AuthService {
 		this.appConfig = appConfig;
 	}
 
-	public async registerUser(userCredentials: RegisterUserPayload): Promise<UserCredentials> {
+	public async registerUser(userCredentials: RegisterUserPayload): Promise<void> {
 		if (
 			await this.userCredentialsRepository.findOne({
 				where: {
@@ -55,10 +54,10 @@ export default class AuthService {
 
 			const hash = await argon2.hash(userCredentials.password);
 
-			return this.userCredentialsRepository.save({
+			await this.userCredentialsRepository.save({
 				email: userCredentials.email,
 				hashedPassword: hash,
-				userId: response.userId,
+				userId: response.id,
 			});
 		} catch (error) {
 			if (error instanceof UsersMicroserviceReferenceUsernameAlreadyUsedError) {

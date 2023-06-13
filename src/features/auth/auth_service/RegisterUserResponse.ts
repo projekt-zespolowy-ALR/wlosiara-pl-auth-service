@@ -1,4 +1,4 @@
 export default class RegisterUserResponse {
-	public readonly userId!: string;
+	public readonly id!: string;
 	public readonly username!: string;
 }
