@@ -58,7 +58,7 @@ export default class AuthService {
 			return this.userCredentialsRepository.save({
 				email: userCredentials.email,
 				hashedPassword: hash,
-				userId: response.userId,
+				userId: response.id,
 			});
 		} catch (error) {
 			if (error instanceof UsersMicroserviceReferenceUsernameAlreadyUsedError) {
