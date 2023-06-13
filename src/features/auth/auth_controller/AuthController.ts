@@ -11,7 +11,6 @@ import {
 } from "@nestjs/common";
 import AuthService from "../auth_service/AuthService.js";
 import RegisterUserRequestBody from "./RegisterUserRequestBody.js";
-import type UserCredentials from "./UserCredentials.js";
 import payloadifyRegisterUserRequestBody from "./PayloadifyRegisterUserRequestBody.js";
 import EmailAlreadyExistsError from "../auth_service/EmailAlreadyExistsError.js";
 import UsersMicroserviceReferenceUsernameAlreadyUsedError from "../auth_service/UsersMicroserviceReferenceUsernameAlreadyUsedError.js";
@@ -35,9 +34,9 @@ export default class AuthController {
 			})
 		)
 		registerUserRequestBody: RegisterUserRequestBody
-	): Promise<UserCredentials> {
+	): Promise<void> {
 		try {
-			return await this.authService.registerUser(
+			await this.authService.registerUser(
 				payloadifyRegisterUserRequestBody(registerUserRequestBody)
 			);
 		} catch (error) {
