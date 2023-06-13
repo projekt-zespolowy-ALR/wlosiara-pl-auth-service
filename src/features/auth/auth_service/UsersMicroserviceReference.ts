@@ -12,7 +12,8 @@ export default class UsersMicroserviceReference {
 	}
 
 	public requestUserCreation(username: string): Promise<RegisterUserResponse> {
-		return fetch(`${this.appConfig.USERS_MICROSERVICE_BASE_URL}/users`, {
+		const arg1 = `${this.appConfig.USERS_MICROSERVICE_BASE_URL}/users`;
+		const arg2 = {
 			method: "POST",
 			body: JSON.stringify({
 				username,
@@ -21,7 +22,11 @@ export default class UsersMicroserviceReference {
 			headers: {
 				"Content-Type": "application/json",
 			},
-		}).then(async (response) => {
+		};
+		console.log(username, Date.now(), "before fetch");
+		const res = fetch(arg1, arg2);
+		console.log(username, Date.now(), "after fetch");
+		return res.then(async (response) => {
 			if (!response.ok) {
 				const errorBody = await response.json();
 				if (errorBody.code === "USERNAME_ALREADY_USED") {
